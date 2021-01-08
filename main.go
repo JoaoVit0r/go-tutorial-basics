@@ -6,9 +6,15 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"strings"
+	"time"
 )
+
+// global constants
+const times = 1
+const delay = 5
 
 func main() {
 	// infinite loop
@@ -29,7 +35,7 @@ func main() {
 		switch choice {
 		case 1:
 			fmt.Println("Iniciando Buscas...")
-			// startSearch()
+			startSearch()
 		case 2:
 			fmt.Println("Exibindo Histórico...")
 			// showHistory()
@@ -89,4 +95,64 @@ func getUrls(cep string, uf string) []string {
 
 	file.Close()
 	return urls
+}
+
+func startSearch() {
+	var cep string
+	var uf string
+
+	fmt.Print("	Digite o Cep: ")
+
+	_, err := fmt.Scan(&cep)
+
+	if err != nil {
+		return
+	}
+
+	fmt.Print("	Digite o UF: ")
+
+	_, err = fmt.Scan(&uf)
+
+	if err != nil {
+		return
+	}
+
+	// get each url from urls.txt
+	urls := getUrls(cep, uf)
+
+	// repeat the search defined times
+	for i := 0; i < times && len(urls) != 0; i++ {
+		for i, url := range urls {
+			fmt.Println("Site", i+1, ":", url)
+			// do a Get Request
+			getRequest(url)
+			fmt.Println("")
+		}
+
+		// wait a few seconds between each search
+		if i != times-1 {
+			time.Sleep(delay * time.Second)
+		}
+	}
+
+	fmt.Println("")
+}
+
+func getRequest(url string) {
+
+	resp, err := http.Get(url)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	if resp.StatusCode == 200 {
+		fmt.Println(url, "foi carregado com sucesso!")
+	} else {
+		fmt.Println(url, "está com problemas. Status Code:", resp.StatusCode)
+	}
+
+	// stores the response in hist.txt
+	// storeResponse(url, resp)
 }
