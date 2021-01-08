@@ -2,7 +2,13 @@
 package main
 
 // imported packages
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"io"
+	"os"
+	"strings"
+)
 
 func main() {
 	// infinite loop
@@ -51,4 +57,36 @@ func getChoice() (int, error) {
 	fmt.Println("__________________________________")
 
 	return choice, nil
+}
+
+func getUrls(cep string, uf string) []string {
+
+	var urls []string
+
+	file, err := os.Open("urls.txt")
+
+	if err != nil {
+		fmt.Println("Error:", err)
+
+		return urls
+	}
+
+	reader := bufio.NewReader(file)
+
+	for {
+		line, err := reader.ReadString('\n')
+		line = strings.TrimSpace(line)
+
+		line = strings.Replace(line, "<CEP>", cep, -1)
+		line = strings.Replace(line, "<UF>", uf, -1)
+
+		urls = append(urls, line)
+
+		if err == io.EOF {
+			break
+		}
+	}
+
+	file.Close()
+	return urls
 }
