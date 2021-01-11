@@ -43,8 +43,8 @@ func main() {
 			showHistory()
 		case 0:
 			fmt.Println("Saindo do programa")
-			// os.Exit(0)
-			return
+			os.Exit(0)
+			// return
 		default:
 			fmt.Println("Opção Inválida")
 		}
@@ -197,4 +197,16 @@ func storeResponse(url string, resp *http.Response) {
 	}
 
 	file.WriteString(bodyStr + "\n")
+}
+
+func showHistory() {
+
+	fileContent, err := ioutil.ReadFile("hist.txt")
+
+	if err != nil {
+		fmt.Println("Error:", err.Error())
+		return
+	}
+
+	fmt.Println(string(fileContent))
 }
