@@ -1,0 +1,9 @@
+08/01/2021 17:08:52 » https://buscacepinter.correios.com.br/app/cep/carrega-cep.php?cep=15 - Status: 200
+{
+    "erro": false,
+    "mensagem": "CEP DEVE CONTER ENTRE 5 E 8 DIGITOS",
+    "total": 0,
+    "dados": []
+}
+08/01/2021 17:08:52 » https://servicodados.ibge.gov.br/api/v1/localidades/estados/1/municipios - Status: 200
+[]

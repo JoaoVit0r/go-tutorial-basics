@@ -6,8 +6,10 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -38,7 +40,7 @@ func main() {
 			startSearch()
 		case 2:
 			fmt.Println("Exibindo Histórico...")
-			// showHistory()
+			showHistory()
 		case 0:
 			fmt.Println("Saindo do programa")
 			// os.Exit(0)
@@ -154,5 +156,45 @@ func getRequest(url string) {
 	}
 
 	// stores the response in hist.txt
-	// storeResponse(url, resp)
+	storeResponse(url, resp)
+}
+
+func storeResponse(url string, resp *http.Response) {
+
+	file, err := os.OpenFile("hist.txt", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+	defer file.Close()
+
+	if err != nil {
+		fmt.Println("Error:", err.Error())
+		return
+	}
+
+	file.WriteString(time.Now().Format("02/01/2006 15:04:05") + " » " + url +
+		" - Status: " + strconv.FormatInt(int64(resp.StatusCode), 10) + "\n")
+
+	defer resp.Body.Close()
+	bodyByte, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		fmt.Println("Error:", err.Error())
+		return
+	}
+
+	bodyStr := strings.TrimSpace(string(bodyByte))
+
+	if len(bodyStr) > 500 {
+		var trunc string
+
+		fmt.Print(" Este é o body da resposta atual/n")
+		fmt.Print(bodyStr)
+		fmt.Print("/n Esta resposta é muito grande, deseja reduzi-la [S/n]: ")
+
+		_, err := fmt.Scan(&trunc)
+
+		if !(err == nil && strings.TrimSpace(strings.ToUpper(trunc)) == "N") {
+			bodyStr = bodyStr[:500] + "..."
+		}
+	}
+
+	file.WriteString(bodyStr + "\n")
 }
